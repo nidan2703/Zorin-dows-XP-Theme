@@ -30,7 +30,7 @@ Zorin OS install).
 ## Install
 
 ```bash
-git clone https://github.com/nidan2703/-Zorin-dows-XP-Theme.git luna-neo
+git clone https://github.com/nidan2703/Zorin-dows-XP-Theme.git luna-neo
 cd luna-neo
 ./luna-neo.sh install
 ./luna-neo.sh apply Blue
