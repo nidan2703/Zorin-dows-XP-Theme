@@ -23,8 +23,9 @@ blue title bars and red close button, freshened up for a modern GNOME desktop.
 - The **User Themes** extension (enabled by default on Zorin OS)
 - `python3` (preinstalled)
 
-Luna Neo is built on top of Zorin's own *ZorinBlue* themes, which it loads from
-`/usr/share/themes` at runtime, so those must be present (they are on every Zorin OS install).
+Luna Neo is built on top of Zorin's own *ZorinBlue* themes. `install` copies their GTK files
+from `/usr/share/themes` into each Luna Neo theme, so those must be present (they are on every
+Zorin OS install).
 
 ## Install
 
@@ -62,6 +63,9 @@ then run `./luna-neo.sh install` again to rebuild and reinstall.
 
 - **Apps that draw their own title bar** keep their own look. These are mostly Electron and
   Chromium apps such as Chrome, VS Code, Slack and the Claude desktop app.
+- **Flatpak apps** only use the theme if they can read `~/.themes`. Those that can't fall
+  back to their default look. To give one access, run
+  `flatpak override --user --filesystem=~/.themes:ro <app-id>`.
 - **Newer GNOME apps (libadwaita)** take the XP colours and title bars, but not every
   detail of the theme.
 - **The Start button can't show a "start" label**: the theme can only restyle what the
@@ -76,7 +80,7 @@ then run `./luna-neo.sh install` again to rebuild and reinstall.
   licensed under GPL-3.0. Bundled unmodified in [`icons/`](icons), except that broken
   symlinks and the prebuilt icon cache were removed (the installer rebuilds the cache). See `icons/Win11-black/AUTHORS` and `icons/Win11-black/COPYING`.
 - **Base themes**: the ZorinBlue GTK and GNOME Shell themes by Zorin OS Technologies Ltd.
-  (GPL), loaded from the system and not redistributed here.
+  (GPL), taken from your own system during install and not redistributed here.
 - **Inspiration**: the Luna visual style of Windows XP.
 
 ## Disclaimer

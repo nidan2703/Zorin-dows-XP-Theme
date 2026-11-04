@@ -9,6 +9,7 @@ GTK themes).
     python3 build.py            -> writes ./themes/Luna-Neo-<Variant>/ and
                                    ./themes/Luna-Neo-<Variant>-Dark/
 """
+import shutil
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -473,11 +474,11 @@ entry:focus-within {{
 """
 
 GTK3_CSS = """/* Luna Neo {label} - GTK 3 */
-@import url("file://{zorin_gtk3}");
+@import url("zorin-base.css");
 """ + TITLEBAR_CSS
 
 GTK4_CSS = """/* Luna Neo {label} - GTK 4 (plain GTK 4 apps and window frames of X11 apps) */
-@import url("file://{zorin_gtk4}");
+@import url("zorin-base.css");
 @import url("libadwaita.css");
 """
 
@@ -545,8 +546,6 @@ def build(key, v, mode):
     v = dict(v, **MODES[mode], key=key, suffix=suffix,
              icon_theme="Win11-black-dark" if mode == "Dark" else "Win11-black",
              zorin_shell=f"{base}/gnome-shell/gnome-shell.css",
-             zorin_gtk3=f"{base}/gtk-3.0/gtk.css",
-             zorin_gtk4=f"{base}/gtk-4.0/gtk.css",
              start_top_hi=lighten(v["start_top"], 0.2),
              accent_dark=darken(v["accent"], 0.15),
              title_hi=lighten(v["title_top"], 0.35),
@@ -567,6 +566,12 @@ def build(key, v, mode):
         path = root / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(template if template is START_LOGO else template.format(**v))
+    # Flatpak apps can read ~/.themes but have their own /usr/share, so the GTK base
+    # has to live inside the theme. An import from /usr/share/themes would fail there
+    # and leave menus without a background.
+    for gtk in ("gtk-3.0", "gtk-4.0"):
+        shutil.copy(f"{base}/{gtk}/gtk.css", root / gtk / "zorin-base.css")
+        shutil.copytree(f"{base}/{gtk}/assets", root / gtk / "assets", dirs_exist_ok=True)
     return root
 
 
