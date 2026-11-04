@@ -49,7 +49,8 @@ access is needed and no system files are touched.
 ```
 
 `apply` sets the shell, GTK and icon themes, switches the desktop to light or dark mode to
-match, and sets the taskbar to content-width. The first time you run it, your current
+match, sets the taskbar to content-width, and turns off Zorin's automatic day/night theme
+switching (which would otherwise replace Luna Neo). The first time you run it, your current
 settings are saved to `~/.config/luna-neo/`, and `revert` restores them.
 
 Apps that are already open keep their old look until you restart them.
@@ -70,6 +71,8 @@ then run `./luna-neo.sh install` again to rebuild and reinstall.
   detail of the theme.
 - **The Start button can't show a "start" label**: the theme can only restyle what the
   Zorin Menu draws, and it only draws an icon.
+- **The Light, Auto and Dark buttons in Zorin Appearance** switch back to Zorin's own themes.
+  Use `./luna-neo.sh apply <Variant>` to change between light and dark instead.
 - **Picking a layout in Zorin Appearance** can reset the taskbar to full width. Run
   `./luna-neo.sh apply <Variant>` again to fix it.
 

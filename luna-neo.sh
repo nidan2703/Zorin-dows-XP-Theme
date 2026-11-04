@@ -16,6 +16,8 @@ STATE_DIR="$HOME/.config/luna-neo"
 BACKUP="$STATE_DIR/backup.env"
 GTK4_CSS="$HOME/.config/gtk-4.0/gtk.css"
 TASKBAR=org.gnome.shell.extensions.zorin-taskbar
+AUTO_THEME=com.zorin.desktop.auto-theme
+AUTO_THEME_DESKTOP=com.zorin.desktop.auto-theme.desktop
 
 variants() {
     [ -d "$HERE/themes" ] || python3 "$HERE/build.py" >/dev/null
@@ -55,13 +57,23 @@ install_themes() {
     done
 }
 
+# Zorin's day/night switcher would replace Luna Neo with a Zorin theme on its schedule.
+# Same steps as choosing Light or Dark in Zorin Appearance; the running process watches the key.
+stop_auto_theme() {
+    gsettings writable $AUTO_THEME enabled >/dev/null 2>&1 || return 0
+    gsettings set $AUTO_THEME enabled false
+    rm -f "$HOME/.config/autostart/$AUTO_THEME_DESKTOP"
+}
+
 # Set every monitor's taskbar to "dynamic" length (-1): it only takes the width it needs.
+# Zorin Taskbar also accepts monitor numbers as keys, which covers fresh accounts that
+# have no saved monitor IDs yet.
 dock_mode() {
     local anchors lengths
     anchors="$(gsettings get $TASKBAR panel-anchors)"
     lengths="$(python3 - "$anchors" "$(gsettings get $TASKBAR panel-element-positions)" <<'EOF'
 import json, sys
-monitors = set()
+monitors = {str(i) for i in range(4)}
 for raw in sys.argv[1:]:
     raw = raw.strip().strip("'")
     if raw.startswith("@"):
@@ -92,10 +104,13 @@ apply_variant() {
             printf 'PANEL_LENGTHS=%q\n' "$(gsettings get $TASKBAR panel-lengths)"
             printf 'PANEL_ANCHORS=%q\n' "$(gsettings get $TASKBAR panel-anchors)"
             printf 'ICON_THEME=%q\n' "$(gsettings get org.gnome.desktop.interface icon-theme)"
+            printf 'AUTO_THEME_ENABLED=%q\n' "$(gsettings get $AUTO_THEME enabled 2>/dev/null || echo false)"
         } >"$BACKUP"
         [ -f "$GTK4_CSS" ] && ! grep -q "Luna Neo" "$GTK4_CSS" && cp "$GTK4_CSS" "$STATE_DIR/gtk4-gtk.css.orig"
         echo "Saved current settings to $BACKUP"
     fi
+
+    stop_auto_theme
 
     # libadwaita apps follow the colour scheme, not the GTK theme.
     local icons
@@ -130,6 +145,12 @@ revert() {
         cp "$STATE_DIR/gtk4-gtk.css.orig" "$GTK4_CSS"
     elif [ -f "$GTK4_CSS" ] && grep -q "Luna Neo" "$GTK4_CSS"; then
         rm "$GTK4_CSS"
+    fi
+    if [ "${AUTO_THEME_ENABLED:-false}" = true ]; then
+        gsettings set $AUTO_THEME enabled true
+        mkdir -p "$HOME/.config/autostart"
+        cp "/usr/share/applications/$AUTO_THEME_DESKTOP" "$HOME/.config/autostart/" || true
+        setsid -f zorin-auto-theme >/dev/null 2>&1 || true
     fi
     rm -f "$BACKUP" "$STATE_DIR/gtk4-gtk.css.orig"
     echo "Restored previous settings."
