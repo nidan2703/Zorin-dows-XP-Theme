@@ -572,6 +572,8 @@ def build(key, v, mode):
     for gtk in ("gtk-3.0", "gtk-4.0"):
         shutil.copy(f"{base}/{gtk}/gtk.css", root / gtk / "zorin-base.css")
         shutil.copytree(f"{base}/{gtk}/assets", root / gtk / "assets", dirs_exist_ok=True)
+    # Zorin Appearance only lists application themes that have a gtk-2.0 folder.
+    shutil.copytree(f"{base}/gtk-2.0", root / "gtk-2.0", dirs_exist_ok=True)
     return root
 
 

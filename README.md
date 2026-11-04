@@ -72,7 +72,8 @@ then run `./luna-neo.sh install` again to rebuild and reinstall.
 - **The Start button can't show a "start" label**: the theme can only restyle what the
   Zorin Menu draws, and it only draws an icon.
 - **The Light, Auto and Dark buttons in Zorin Appearance** switch back to Zorin's own themes.
-  Use `./luna-neo.sh apply <Variant>` to change between light and dark instead.
+  Use `./luna-neo.sh apply <Variant>` to change between light and dark instead. Picking a
+  theme in the **Other** tab there changes only that one setting, so apps may not fully follow.
 - **Picking a layout in Zorin Appearance** can reset the taskbar to full width. Run
   `./luna-neo.sh apply <Variant>` again to fix it.
 
